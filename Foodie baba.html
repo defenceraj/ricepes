@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style> 
+     body{
+background-color: #353935;
+        }
+        option{
+            color: black;
+        }
+
+        select{
+            outline: none;
+            border: 1px solid;
+            padding: 6px 12px;
+            border-radius: 5px 0 0 5px;
+            border-right: none;
+
+        }
+ .mobileUl{
+  display: none;
+}
+
+.mobileUl.active{
+  display: flex;
+} 
+
+</style>
+</head>
+<body>
+    <nav class="w-full px-12 flex justify-between items-center relative text-white  h-[65px] bg-[black]">
+        <h1 class="font-semibold text-xl w-[200px] flex items-center capitalize ">
+             <img class="w-10 h-10 rounded-full" src="https://png.pngtree.com/png-vector/20220705/ourmid/pngtree-food-logo-png-image_5687686.png" alt="">
+             
+             <h1>Foodie Baba</h1>
+
+             <div class="flex items-center w-full justify-center">
+                <div class="categoriesBox ">
+                 
+            </div>
+            <div class="sm:flex hidden  items-center">
+                <input type="text" id="inputSearch" class="outline-none border px-4 py-1 " placeholder="search a dish..">
+                <button onclick="handleSearch()" class="bg-blue-700 text-white px-4 py-1  rounded-md hover:bg-blue-950">search</button>
+            </div>
+             </div>
+
+    </nav>
+ <div class="container mt-4  grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 m-auto">
+          
+    </div>
+
+ <script>
+
+        let container = document.querySelector('.container')
+        let categoriesBox = document.querySelector('.categoriesBox')
+        let inputSearchTag = document.querySelector('#inputSearch')
+
+        let loggedInUser = localStorage.getItem('newsLogin');
+        
+        let mobileUlTag = document.querySelector('.mobileUl')
+        const handleMenuClicked = () => {
+            mobileUlTag.classList.toggle('active')
+        }
+
+
+        async function getNews(search) {
+            let res = await fetch(`https://dummyjson.com/recipes/search?q=${search}&limit=0`)
+            let data = await res.json()
+            console.log(data) 
+            console.log(data.recipes)
+    
+
+            container.innerHTML = ''
+
+            data.recipes.forEach((val, i) => {
+
+                container.innerHTML = container.innerHTML + `
+            <div class="box  bg-black text-white p-3 flex flex-col gap-4 justify-between">
+                <img class="w-full " src=${val.image} alt="">
+                <p class="font-semibold">${val.name}</p>
+                <a onclick='handleMove(${val.id})' class="bg-[#0f0f26] hover:bg-[#323268] text-center text-white px-3 py-2 rounded"> View full recipe </a>
+            </div>`
+
+        })
+        
+    }
+    
+    function handleMove(id){
+        console.log(id)
+        localStorage.setItem('recipeId',id)
+        window.location.href = ViewRecipe.html
+    }
+        getNews('')
+
+
+        async function getCategories(){
+           let res = await fetch('https://dummyjson.com/recipes/tags')
+            let data = await res.json()
+            data.length = 10
+            console.log(data)
+            
+            let selectTag = document.createElement('select');
+
+            selectTag.onchange=(e)=>{
+                console.log(e.target.value);
+                   getNews(e.target.value)
+                
+            }
+            selectTag.innerHTML = ' <option value="">Menu</option>'
+            data.forEach((val,i)=>{
+                let optionTag =  document.createElement('option');
+                optionTag.value=val
+                optionTag.innerHTML=val;
+                selectTag.append(optionTag) 
+            })
+
+            console.log(selectTag)
+            categoriesBox.append(selectTag)
+            
+        }
+
+        getCategories()
+
+
+
+        const handleSearch = ()=>{
+           getNews(inputSearchTag.value)
+        }
+
+    </script>
+ 
+</body>
+</html> 
